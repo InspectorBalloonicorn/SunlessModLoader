@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34202.233
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SunlessModLoader", "SunlessModLoader\SunlessModLoader.csproj", "{F1AA86A6-FA36-49E0-B505-1BC7DE1D0614}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F1AA86A6-FA36-49E0-B505-1BC7DE1D0614}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1AA86A6-FA36-49E0-B505-1BC7DE1D0614}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1AA86A6-FA36-49E0-B505-1BC7DE1D0614}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1AA86A6-FA36-49E0-B505-1BC7DE1D0614}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C343F7EE-836F-403F-82DF-B75E577329F6}
+	EndGlobalSection
+EndGlobal

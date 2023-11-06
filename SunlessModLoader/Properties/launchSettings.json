@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SunlessModLoader": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Users\\Aaron Laptop PC\\AppData\\LocalLow\\Failbetter Games\\Sunless Sea\\addon\"\r\n\"C:\\\\Users\\\\Aaron Laptop PC\\\\AppData\\\\LocalLow\\\\Failbetter Games\\\\Sunless Sea\""
+    }
+  }
+}
