@@ -8,13 +8,14 @@ using System.Text;
 using System.Text.RegularExpressions;
 using static System.Net.Mime.MediaTypeNames;
 using System.Xml.Linq;
+using System.Reflection.Emit;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace SunlessModLoader.Classes.Helpers
 {
     public class SunlessModHelper
     {
         public int ConflictCounter{ get; set; }
-        public string AddonName { get; set; }
             
         #region READ DATA
         public void ReadEntities(string folderPath, ref List<Area> areaList, ref List<Event> eventList,
@@ -78,7 +79,6 @@ namespace SunlessModLoader.Classes.Helpers
         #endregion
 
         #region COMPARE AND HANDLE OBJECTS
-
         public List<Event> CompareAndHandleEvents(Event addonEvent, List<Event> masterEventList)
         {
             bool isModifiedExisting = false;
@@ -229,6 +229,86 @@ namespace SunlessModLoader.Classes.Helpers
             }
             return masterQualitiesAffectedList;
         }
+        private List<Enhancement> CompareAndHandleEnhancements(List<Enhancement> addonEnhancementsList, List<Enhancement> masterEnhancementsList)
+        {
+            bool isModifiedExisting = false;
+            int idToCheck = 0;
+            //iterate over addon child branches
+            for (int x = 0; x < addonEnhancementsList.Count(); x++)
+            {
+                isModifiedExisting = false;
+                Enhancement addonEnhancement = addonEnhancementsList[x];
+                //iterate over master branches to check if we find a match
+                for (int y = 0; y < masterEnhancementsList.Count(); y++)
+                {
+                    {
+                        Enhancement masterEnhancement = masterEnhancementsList[y];
+
+                        if (addonEnhancement.Id == masterEnhancement.Id && !addonEnhancement.IsEquals(masterEnhancement))
+                        {
+                            //If you match IDs here but are otherwise not equal, you are modifying an existing child object in this event,
+                            //and we need to check whats changed and merge.
+                            ConflictCounter++;
+                            Enhancement mergedEnhancement = MergeEnhancements(addonEnhancement, masterEnhancement);
+                            masterEnhancementsList[y] = mergedEnhancement;
+                            isModifiedExisting = true;
+                            break;
+                        }
+                        else if (addonEnhancement.Id == masterEnhancement.Id)
+                        {
+                            isModifiedExisting = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!isModifiedExisting)
+                {
+                    masterEnhancementsList.Add(addonEnhancement);
+                }
+            }
+            return masterEnhancementsList;
+        }
+        private List<Quality> CompareAndHandleQualityLists(List<Quality> addonQualityList, List<Quality> masterQualityList)
+        {
+            bool isModifiedExisting = false;
+            int idToCheck = 0;
+            //iterate over addon child branches
+            for (int x = 0; x < addonQualityList.Count(); x++)
+            {
+                isModifiedExisting = false;
+                Quality addonQuality = addonQualityList[x];
+                //iterate over master branches to check if we find a match
+                for (int y = 0; y < masterQualityList.Count(); y++)
+                {
+                    {
+                        Quality masterQuality = masterQualityList[y];
+
+                        if (addonQuality.Id == masterQuality.Id && !addonQuality.IsEquals(masterQuality))
+                        {
+                            //If you match IDs here but are otherwise not equal, you are modifying an existing child object in this event,
+                            //and we need to check whats changed and merge.
+                            ConflictCounter++;
+                            Quality mergedQuality = MergeQualities(addonQuality, masterQuality);
+                            masterQualityList[y] = mergedQuality;
+                            isModifiedExisting = true;
+                            break;
+                        }
+                        else if (addonQuality.Id == masterQuality.Id)
+                        {
+                            isModifiedExisting = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!isModifiedExisting)
+                {
+                    masterQualityList.Add(addonQuality);
+                }
+            }
+            return masterQualityList;
+        }
         public List<Quality> CompareAndHandleQualities(Quality addonQuality, List<Quality> masterQualityList)
         {
             bool isModifiedExisting = false;
@@ -257,6 +337,235 @@ namespace SunlessModLoader.Classes.Helpers
             }
 
             return masterQualityList;
+        }
+        public List<Personae> CompareAndHandlePersonas(Personae addonPersona, List<Personae> masterPersonaList)
+        {
+            bool isModifiedExisting = false;
+            int idToCheck = 0;
+            //process through event list, check if any ids match the passed in id
+            for (int x = 0; x < masterPersonaList.Count(); x++)
+            {
+                Personae masterPersona = masterPersonaList[x];
+
+                if (addonPersona.Id == masterPersona.Id)
+                {
+                    //If you match IDs, you are modifying an existing event,
+                    //and we need to check what's changed and merge.
+
+                    ConflictCounter++;
+                    isModifiedExisting = true;
+                    Personae mergedPersonas = MergePersonas(addonPersona, masterPersona);
+                    masterPersonaList[x] = mergedPersonas;
+                    break;
+                }
+            }
+
+            if (!isModifiedExisting)
+            {
+                masterPersonaList.Add(addonPersona);
+            }
+
+            return masterPersonaList;
+        }
+        public List<Area> CompareAndHandleAreas(Area addonArea, List<Area> masterAreaList)
+        {
+            bool isModifiedExisting = false;
+            int idToCheck = 0;
+            //process through event list, check if any ids match the passed in id
+            for (int x = 0; x < masterAreaList.Count(); x++)
+            {
+                Area masterArea = masterAreaList[x];
+
+                if (addonArea.Id == masterArea.Id)
+                {
+                    //If you match IDs, you are modifying an existing event,
+                    //and we need to check what's changed and merge.
+
+                    ConflictCounter++;
+                    isModifiedExisting = true;
+                    Area mergedAreas = MergeAreas(addonArea, masterArea);
+                    masterAreaList[x] = mergedAreas;
+                    break;
+                }
+            }
+
+            if (!isModifiedExisting)
+            {
+                masterAreaList.Add(addonArea);
+            }
+
+            return masterAreaList;
+        }
+        public List<Exchange> CompareAndHandleExchanges(Exchange addonExchange, List<Exchange> masterExchangeList)
+        {
+            bool isModifiedExisting = false;
+            int idToCheck = 0;
+            //process through event list, check if any ids match the passed in id
+            for (int x = 0; x < masterExchangeList.Count(); x++)
+            {
+                Exchange masterExchange = masterExchangeList[x];
+
+                if (addonExchange.Id == masterExchange.Id)
+                {
+                    //If you match IDs, you are modifying an existing event,
+                    //and we need to check what's changed and merge.
+
+                    ConflictCounter++;
+                    isModifiedExisting = true;
+                    Exchange mergedExchange = MergeExchanges(addonExchange, masterExchange);
+                    masterExchangeList[x] = mergedExchange;
+                    break;
+                }
+            }
+
+            if (!isModifiedExisting)
+            {
+                masterExchangeList.Add(addonExchange);
+            }
+
+            return masterExchangeList;
+        }
+        private List<Shop> CompareAndHandleShops(List<Shop> addonShops, List<Shop> masterShops)
+        {
+            bool isModifiedExisting = false;
+            int idToCheck = 0;
+            //iterate over addon child branches
+            for (int x = 0; x < addonShops.Count(); x++)
+            {
+                isModifiedExisting = false;
+                Shop addonShop = addonShops[x];
+                //iterate over master branches to check if we find a match
+                for (int y = 0; y < masterShops.Count(); y++)
+                {
+                    {
+                        Shop masterShop = masterShops[y];
+
+                        if (addonShop.Id == masterShop.Id && !addonShop.IsEquals(masterShop))
+                        {
+                            //If you match IDs here but are otherwise not equal, you are modifying an existing child object in this event,
+                            //and we need to check whats changed and merge.
+                            ConflictCounter++;
+                            Shop mergedShop = MergeShops(addonShop, masterShop);
+                            masterShops[y] = mergedShop;
+                            isModifiedExisting = true;
+                            break;
+                        }
+                        else if (addonShop.Id == masterShop.Id)
+                        {
+                            isModifiedExisting = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!isModifiedExisting)
+                {
+                    masterShops.Add(addonShop);
+                }
+            }
+            return masterShops;
+        }
+        private List<Availability> CompareAndHandleAvailabilities(List<Availability> addonAvailList, List<Availability> masterAvailList)
+        {
+            bool isModifiedExisting = false;
+            int idToCheck = 0;
+            //iterate over addon child branches
+            for (int x = 0; x < addonAvailList.Count(); x++)
+            {
+                isModifiedExisting = false;
+                Availability addonAvailability = addonAvailList[x];
+                //iterate over master branches to check if we find a match
+                for (int y = 0; y < masterAvailList.Count(); y++)
+                {
+                    {
+                        Availability masterAvailability = masterAvailList[y];
+
+                        if (addonAvailability.Id == masterAvailability.Id && !addonAvailability.IsEquals(masterAvailability))
+                        {
+                            //If you match IDs here but are otherwise not equal, you are modifying an existing child object in this event,
+                            //and we need to check whats changed and merge.
+                            ConflictCounter++;
+                            Availability mergedAvail = MergeAvailabilities(addonAvailability, masterAvailability);
+                            masterAvailList[y] = mergedAvail;
+                            isModifiedExisting = true;
+                            break;
+                        }
+                        else if (addonAvailability.Id == masterAvailability.Id)
+                        {
+                            isModifiedExisting = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!isModifiedExisting)
+                {
+                    masterAvailList.Add(addonAvailability);
+                }
+            }
+            return masterAvailList;
+        }
+
+        private Availability MergeAvailabilities(Availability addonAvailability, Availability masterAvailability)
+        {
+            if (addonAvailability.Cost != masterAvailability.Cost) { masterAvailability.Cost = addonAvailability.Cost; }
+            if (addonAvailability.SellPrice != masterAvailability.SellPrice) { masterAvailability.SellPrice = addonAvailability.SellPrice; }
+            if (addonAvailability.BuyMessage != masterAvailability.BuyMessage) { masterAvailability.BuyMessage = addonAvailability.BuyMessage; }
+            if (addonAvailability.SellMessage != masterAvailability.SellMessage) { masterAvailability.SellMessage = addonAvailability.SellMessage; }
+
+            //check Quality
+            if (addonAvailability.Quality == null && masterAvailability.Quality == null) { /*Do Nothing*/ }
+            else if (addonAvailability.Quality == null && masterAvailability.Quality != null) { masterAvailability.Quality = addonAvailability.Quality; }
+            else if (addonAvailability.Quality != null && masterAvailability.Quality == null) { masterAvailability.Quality = addonAvailability.Quality; }
+            else { if (!addonAvailability.Quality.IsEquals(masterAvailability.Quality)) { masterAvailability.Quality = addonAvailability.Quality; } }
+
+            //check PurchaseQuality
+            if (addonAvailability.PurchaseQuality == null && masterAvailability.PurchaseQuality == null) { /*Do Nothing*/ }
+            else if (addonAvailability.PurchaseQuality == null && masterAvailability.PurchaseQuality != null) { masterAvailability.PurchaseQuality = addonAvailability.PurchaseQuality; }
+            else if (addonAvailability.PurchaseQuality != null && masterAvailability.PurchaseQuality == null) { masterAvailability.PurchaseQuality = addonAvailability.PurchaseQuality; }
+            else { if (!addonAvailability.PurchaseQuality.IsEquals(masterAvailability.PurchaseQuality)) { masterAvailability.PurchaseQuality = addonAvailability.PurchaseQuality; } }
+
+            return masterAvailability;
+        }
+
+        private List<int> CompareAndHandleSettingIds(List<int> addonSettingIds, List<int> masterSettingIds)
+        {
+            bool isModifiedExisting = false;
+            int idToCheck = 0;
+            //iterate over addon child branches
+            for (int x = 0; x < addonSettingIds.Count(); x++)
+            {
+                isModifiedExisting = false;
+                int addonSettingId = addonSettingIds[x];
+                //iterate over master branches to check if we find a match
+                for (int y = 0; y < masterSettingIds.Count(); y++)
+                {
+                    {
+                        int masterQuality = masterSettingIds[y];
+
+                        if (addonSettingId == masterQuality && !addonSettingId.Equals(masterQuality))
+                        {
+                            //If you match IDs here but are otherwise not equal, you are modifying an existing child object in this event,
+                            //and we need to check whats changed and merge.
+                            ConflictCounter++;
+                            masterSettingIds[y] = addonSettingId;
+                            isModifiedExisting = true;
+                            break;
+                        }
+                        else if (addonSettingId == masterQuality)
+                        {
+                            isModifiedExisting = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!isModifiedExisting)
+                {
+                    masterSettingIds.Add(addonSettingId);
+                }
+            }
+            return masterSettingIds;
         }
 
         #endregion
@@ -453,8 +762,11 @@ namespace SunlessModLoader.Classes.Helpers
                             matchFound = true;
                         };
                     }
-                    //TODO: Update this to CompareAndHandleQualityLists(List<Qualities>, List<Qualities>)
-                    if (matchFound == false) masterQuality.QualitiesWhichAllowSecondChanceOnThis = addonQuality.QualitiesWhichAllowSecondChanceOnThis;
+                    if (matchFound == false)
+                    {
+                        masterQuality.QualitiesWhichAllowSecondChanceOnThis =
+                            CompareAndHandleQualityLists(addonQuality.QualitiesWhichAllowSecondChanceOnThis, masterQuality.QualitiesWhichAllowSecondChanceOnThis);
+                    }
                 }
             }
 
@@ -476,14 +788,31 @@ namespace SunlessModLoader.Classes.Helpers
                             matchFound = true;
                         };
                     }
-                    //TODO: Update this to CompareAndHandleEnhancements(List<Enhancement>, List<Enhancement>)
-                    if (matchFound == false) masterQuality.Enhancements = addonQuality.Enhancements;
+                    
+                    if (matchFound == false) masterQuality.Enhancements = CompareAndHandleEnhancements(addonQuality.Enhancements, masterQuality.Enhancements);
                 }
             }            
 
             return masterQuality;
         }
+        private Enhancement MergeEnhancements(Enhancement addonEnhancement, Enhancement masterEnhancement)
+        {
+            if (addonEnhancement.Level != masterEnhancement.Level) masterEnhancement.Level = addonEnhancement.Level;
+            if (addonEnhancement.AssociatedQualityId != masterEnhancement.AssociatedQualityId) masterEnhancement.AssociatedQualityId = addonEnhancement.AssociatedQualityId;
+            if (addonEnhancement.QualityName != masterEnhancement.QualityName) masterEnhancement.QualityName = addonEnhancement.QualityName;
+            if (addonEnhancement.QualityDescription != masterEnhancement.QualityDescription) masterEnhancement.QualityDescription = addonEnhancement.QualityDescription;
+            if (addonEnhancement.QualityImage != masterEnhancement.QualityImage) masterEnhancement.QualityImage = addonEnhancement.QualityImage;
+            if (addonEnhancement.QualityCategory != masterEnhancement.QualityCategory) masterEnhancement.QualityCategory = addonEnhancement.QualityCategory;
+            if (addonEnhancement.QualityAllowedOn != masterEnhancement.QualityAllowedOn) masterEnhancement.QualityAllowedOn = addonEnhancement.QualityAllowedOn;
 
+            //Check AssociatedQuality
+            if (addonEnhancement.AssociatedQuality == null && masterEnhancement.AssociatedQuality == null) { /*Do Nothing*/ }
+            else if (addonEnhancement.AssociatedQuality == null && masterEnhancement.AssociatedQuality != null) { masterEnhancement.AssociatedQuality = addonEnhancement.AssociatedQuality; }
+            else if (addonEnhancement.AssociatedQuality != null && masterEnhancement.AssociatedQuality == null) { masterEnhancement.AssociatedQuality = addonEnhancement.AssociatedQuality; }
+            else { if (!addonEnhancement.AssociatedQuality.IsEquals(masterEnhancement.AssociatedQuality)) { masterEnhancement.AssociatedQuality = addonEnhancement.AssociatedQuality; } }
+
+            return masterEnhancement;
+        }
         private ChildBranches MergeChildBranches(ChildBranches addonChildBranch, ChildBranches masterChildBranch)
         {
             bool matchFound;
@@ -613,6 +942,210 @@ namespace SunlessModLoader.Classes.Helpers
 
             return masterQualitiesAffected;
         }
+        private Personae MergePersonas(Personae addonPersona, Personae masterPersona)
+        {
+            bool matchFound;
+            if (addonPersona.Description != masterPersona.Description) { masterPersona.Description = addonPersona.Description; }
+            if (addonPersona.OwnerName != masterPersona.OwnerName) { masterPersona.Description = addonPersona.Description; }
+            if (addonPersona.Name != masterPersona.Name) { masterPersona.Description = addonPersona.Description; }
+
+            //Check Setting
+            if (addonPersona.Setting == null && masterPersona.Setting == null) { /*Do Nothing*/ }
+            else if (addonPersona.Setting == null && masterPersona.Setting != null) { masterPersona.Description = addonPersona.Description; }
+            else if (addonPersona.Setting != null && masterPersona.Setting == null) { masterPersona.Description = addonPersona.Description; }
+            else { if (!addonPersona.Setting.IsEquals(masterPersona.Setting)) { masterPersona.Description = addonPersona.Description; } }
+
+            //Check DateTimeCreated
+            if (addonPersona.DateTimeCreated == null && masterPersona.DateTimeCreated == null) { /*Do Nothing*/ }
+            else if (addonPersona.DateTimeCreated == null && masterPersona.DateTimeCreated != null) { masterPersona.Description = addonPersona.Description; }
+            else if (addonPersona.DateTimeCreated != null && masterPersona.DateTimeCreated == null) { masterPersona.Description = addonPersona.Description; }
+            else { if (!addonPersona.DateTimeCreated.Equals(masterPersona.DateTimeCreated)) { masterPersona.Description = addonPersona.Description; } }
+
+            //Check QualitiesAffected
+            if (addonPersona.QualitiesAffected == null && masterPersona.QualitiesAffected == null) { /*do nothing*/ }
+            else if (addonPersona.QualitiesAffected == null && masterPersona.QualitiesAffected != null) { masterPersona.Description = addonPersona.Description; }
+            else if (addonPersona.QualitiesAffected != null && masterPersona.QualitiesAffected == null) { masterPersona.Description = addonPersona.Description; }
+            else
+            {
+                foreach (QualitiesAffected qa in addonPersona.QualitiesAffected)
+                {
+                    //check against the master list of child branches and confirm the childbranch matches in the list.
+                    //If a child object is found that doesn't match exactly, the events are not equal.
+                    matchFound = false;
+                    foreach (QualitiesAffected qa2 in masterPersona.QualitiesAffected)
+                    {
+                        if (qa.IsEquals(qa2))
+                        {
+                            matchFound = true;
+                            break;
+                        };
+                    }
+                    if (matchFound == false) masterPersona.QualitiesAffected = CompareAndHandleQualitiesAffected(addonPersona.QualitiesAffected, masterPersona.QualitiesAffected);
+                }
+            }
+
+            //Check QualitiesRequired
+            if (addonPersona.QualitiesRequired == null && masterPersona.QualitiesRequired == null) { /*do nothing*/ }
+            else if (addonPersona.QualitiesRequired == null && masterPersona.QualitiesRequired != null) { masterPersona.QualitiesRequired = addonPersona.QualitiesRequired; }
+            else if (addonPersona.QualitiesRequired != null && masterPersona.QualitiesRequired == null) { masterPersona.QualitiesRequired = addonPersona.QualitiesRequired; }
+            else
+            {
+                foreach (QualitiesRequired qr in addonPersona.QualitiesRequired)
+                {
+                    //check against the master list of child branches and confirm the childbranch matches in the list.
+                    //If a child object is found that doesn't match exactly, the events are not equal.
+                    matchFound = false;
+                    foreach (QualitiesRequired qr2 in masterPersona.QualitiesRequired)
+                    {
+                        if (qr.IsEquals(qr2))
+                        {
+                            matchFound = true;
+                        };
+                    }
+                    if (matchFound == false) masterPersona.QualitiesRequired = CompareAndHandleQualitiesRequired(addonPersona.QualitiesRequired, masterPersona.QualitiesRequired);
+                }
+            }
+
+            return masterPersona;
+        }
+        private Area MergeAreas(Area addonArea, Area masterArea)
+        {
+            if (addonArea.Name != masterArea.Name) masterArea.Name = addonArea.Name;
+            if (addonArea.Description != masterArea.Description) masterArea.Description = addonArea.Description;
+            if (addonArea.ImageName != masterArea.ImageName) masterArea.ImageName = addonArea.ImageName;
+            if (addonArea.MarketAccessPermitted != masterArea.MarketAccessPermitted) masterArea.MarketAccessPermitted = addonArea.MarketAccessPermitted;
+            if (addonArea.MoveMessage != masterArea.MoveMessage) masterArea.MoveMessage = addonArea.MoveMessage;
+            if (addonArea.HideName != masterArea.HideName) masterArea.HideName = addonArea.HideName;
+            if (addonArea.RandomPostcard != masterArea.RandomPostcard) masterArea.RandomPostcard = addonArea.RandomPostcard;
+            if (addonArea.MapX != masterArea.MapX) masterArea.MapX = addonArea.MapX;
+            if (addonArea.MapY != masterArea.MapY) masterArea.MapY = addonArea.MapY;
+            if (addonArea.ShowOps != masterArea.ShowOps) masterArea.ShowOps = addonArea.ShowOps;
+            if (addonArea.PremiumSubRequired != masterArea.PremiumSubRequired) masterArea.PremiumSubRequired = addonArea.PremiumSubRequired;
+            if (addonArea.Id != masterArea.Id) masterArea.Id = addonArea.Id;
+
+            //check UnlocksWithQuality
+            if (addonArea.UnlocksWithQuality == null && masterArea.UnlocksWithQuality == null) { /*Do Nothing*/ }
+            else if (addonArea.UnlocksWithQuality == null && masterArea.UnlocksWithQuality != null) { masterArea.UnlocksWithQuality = addonArea.UnlocksWithQuality; }
+            else if (addonArea.UnlocksWithQuality != null && masterArea.UnlocksWithQuality == null) { masterArea.UnlocksWithQuality = addonArea.UnlocksWithQuality; }
+            else { if (!addonArea.UnlocksWithQuality.IsEquals(masterArea.UnlocksWithQuality)) { masterArea.UnlocksWithQuality = addonArea.UnlocksWithQuality; } }
+
+            return masterArea;
+        }
+        private Exchange MergeExchanges(Exchange addonExchange, Exchange masterExchange)
+        {
+            bool matchFound;
+            if (addonExchange.Name != masterExchange.Name) { masterExchange.Name = addonExchange.Name; }
+            if (addonExchange.Title != masterExchange.Title) { masterExchange.Title = addonExchange.Title; }
+            if (addonExchange.Image != masterExchange.Image) { masterExchange.Image = addonExchange.Image; }
+            if (addonExchange.Description != masterExchange.Description) { masterExchange.Description = addonExchange.Description; }
+
+            //Check SettingIds
+            if (addonExchange.SettingIds == null && masterExchange.SettingIds == null) { /*Do nothing*/ }
+            else if (addonExchange.SettingIds == null && masterExchange.SettingIds != null) { masterExchange.SettingIds = addonExchange.SettingIds; }
+            else if (addonExchange.SettingIds != null && masterExchange.SettingIds == null) { masterExchange.SettingIds = addonExchange.SettingIds; }
+            else
+            {
+                //For each child branch required from this addon event
+                foreach (int settingId in addonExchange.SettingIds)
+                {
+                    //check against the master list of child branches and confirm the childbranch matches in the list.
+                    //If a child object is found that doesn't match exactly, the events are not equal.
+                    matchFound = false;
+                    foreach (int settingId2 in masterExchange.SettingIds)
+                    {
+                        if (settingId.Equals(settingId2))
+                        {
+                            matchFound = true;
+                            break;
+                        };
+                    }
+                    if (matchFound == false) masterExchange.SettingIds = CompareAndHandleSettingIds(addonExchange.SettingIds, masterExchange.SettingIds);
+                }
+            }
+
+            //Check Shops
+            if (addonExchange.Shops == null && masterExchange.Shops == null) { /*Do nothing*/ }
+            else if (addonExchange.Shops == null && masterExchange.Shops != null) { masterExchange.Shops = addonExchange.Shops; }
+            else if (addonExchange.Shops != null && masterExchange.Shops == null) { masterExchange.Shops = addonExchange.Shops; }
+            else
+            {
+                //For each child branch required from this addon event
+                foreach (Shop shop in addonExchange.Shops)
+                {
+                    //check against the master list of child branches and confirm the childbranch matches in the list.
+                    //If a child object is found that doesn't match exactly, the events are not equal.
+                    matchFound = false;
+                    foreach (Shop shop2 in masterExchange.Shops)
+                    {
+                        if (shop.IsEquals(shop2))
+                        {
+                            matchFound = true;
+                            break;
+                        };
+                    }//TODO: CompareAndHandleShops
+                    if (matchFound == false) masterExchange.Shops = CompareAndHandleShops(addonExchange.Shops, masterExchange.Shops);
+                }
+            }
+
+            return masterExchange;
+        }
+        private Shop MergeShops(Shop addonShop, Shop masterShop)
+        {
+            bool matchFound;
+            if (addonShop.Name != masterShop.Name) { masterShop.Name = addonShop.Name; }
+            if (addonShop.Image != masterShop.Image) { masterShop.Image = addonShop.Image; }
+            if (addonShop.Description != masterShop.Description) { masterShop.Description = addonShop.Description; }
+            if (addonShop.Ordering != masterShop.Ordering) { masterShop.Ordering = addonShop.Ordering; }
+
+            //Check QualitiesRequired
+            if (addonShop.QualitiesRequired == null && masterShop.QualitiesRequired == null) {  }
+            else if (addonShop.QualitiesRequired == null && masterShop.QualitiesRequired != null) { masterShop.QualitiesRequired = addonShop.QualitiesRequired; }
+            else if (addonShop.QualitiesRequired != null && masterShop.QualitiesRequired == null) { masterShop.QualitiesRequired = addonShop.QualitiesRequired; }
+            else
+            {
+                foreach (QualitiesRequired qr in addonShop.QualitiesRequired)
+                {
+                    //check against the master list of child branches and confirm the childbranch matches in the list.
+                    //If a child object is found that doesn't match exactly, the events are not equal.
+                    matchFound = false;
+                    foreach (QualitiesRequired qr2 in masterShop.QualitiesRequired)
+                    {
+                        if (qr.IsEquals(qr2))
+                        {
+                            matchFound = true;
+                            break;
+                        };
+                    }
+                    if (matchFound == false) masterShop.QualitiesRequired = CompareAndHandleQualitiesRequired(addonShop.QualitiesRequired, masterShop.QualitiesRequired);
+                }
+            }
+
+            //Check Availabilities
+            if (addonShop.Availabilities == null && masterShop.Availabilities == null) {  }
+            else if (addonShop.Availabilities == null && masterShop.Availabilities != null) { masterShop.Name = addonShop.Name; }
+            else if (addonShop.Availabilities != null && masterShop.Availabilities == null) { masterShop.Name = addonShop.Name; }
+            else
+            {
+                foreach (Availability av in addonShop.Availabilities)
+                {
+                    //check against the master list of child branches and confirm the childbranch matches in the list.
+                    //If a child object is found that doesn't match exactly, the events are not equal.
+                    matchFound = false;
+                    foreach (Availability av2 in masterShop.Availabilities)
+                    {
+                        if (av.IsEquals(av2))
+                        {
+                            matchFound = true;
+                            break;
+                        };
+                    }
+                    if (matchFound == false) masterShop.Availabilities = CompareAndHandleAvailabilities(addonShop.Availabilities, masterShop.Availabilities);
+                }
+            }
+
+            return masterShop;
+        }
+
         #endregion
 
         #region WRITE DATA
@@ -620,10 +1153,43 @@ namespace SunlessModLoader.Classes.Helpers
         public void WriteEntities(string entitiesOutputPath, List<Area> areaList, List<Event> eventList,
            List<Exchange> exchangeList, List<Personae> personaList, List<Quality> qualityList)
         {
+            var areaOutputFilePath = entitiesOutputPath + "\\areas.json";
+            var eventOutputFilePath = entitiesOutputPath + "\\events.json";
+            var exchangeOutputFilePath = entitiesOutputPath + "\\exchanges.json";
+            var personaOutputFilePath = entitiesOutputPath + "\\personas.json";
+            var qualityOutputFilePath = entitiesOutputPath + "\\qualities.json";
+
+            //Write Areas
+            string areaOutput = JsonConvert.SerializeObject(areaList, Formatting.Indented);
+            File.Create(areaOutputFilePath).Close();
+            File.WriteAllText(areaOutputFilePath, areaOutput);
+
             //Write Events
-            string output = JsonConvert.SerializeObject(eventList, Formatting.Indented);
-            Console.WriteLine(output);
+            string eventOutput = JsonConvert.SerializeObject(eventList, Formatting.Indented);
+            File.Create(eventOutputFilePath).Close();
+            File.WriteAllText(eventOutputFilePath, eventOutput);
+
+            //Write Exchanges
+            string exchangeOutput = JsonConvert.SerializeObject(exchangeList, Formatting.Indented);
+            File.Create(exchangeOutputFilePath).Close();
+            File.WriteAllText(exchangeOutputFilePath, exchangeOutput);
+
+            //Write Personae
+            string personaeOutput = JsonConvert.SerializeObject(personaList, Formatting.Indented);
+            File.Create(personaOutputFilePath).Close();
+            File.WriteAllText(personaOutputFilePath, personaeOutput);
+
+            //Write Quality
+            string qualityOutput = JsonConvert.SerializeObject(qualityList, Formatting.Indented);
+            File.Create(qualityOutputFilePath).Close();
+            File.WriteAllText(qualityOutputFilePath, qualityOutput);
         }
+
+
+
+
+
+
 
 
 

@@ -27,7 +27,9 @@ namespace SunlessModLoader.Classes.Classes
             if (!ReferenceEquals(qa, null) && ReferenceEquals(this, null)) { return false; }
 
             if (Level != qa.Level) return false;
-            if(AssociatedQuality != qa.AssociatedQuality) return false;
+
+            if(AssociatedQuality != qa.AssociatedQuality) return false; //Objectify
+
             if(Id != qa.Id) return false;
             if(Priority != qa.Priority) return false;
             if(SetToExactly != qa.SetToExactly) return false;

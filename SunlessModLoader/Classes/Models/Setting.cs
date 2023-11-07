@@ -33,42 +33,43 @@ namespace SunlessModLoader.Classes.Classes
             if (World != setting.World) return false;
             if (OwnerName != setting.OwnerName) return false;
             if (Name != setting.Name) return false;
-
-            foreach (Personae persona in Personae)
-            {
-                //check against the master list of Enhancements and confirm the childbranch Enhancements are in the list.
-                //If an Enhancement is found that doesn't match exactly, the events are not equal.
-                matchFound = false;
-                foreach (Personae persona2 in setting.Personae)
-                {
-                    if (persona.IsEquals(persona2))
-                    {
-                        matchFound = true;
-                    };
-                }
-                if (matchFound == false) return false;
-            }
-
             if (StartingArea != setting.StartingArea) return false;
             if (StartingDomicile != setting.StartingDomicile) return false;
             if (ItemsUsableHere != setting.ItemsUsableHere) return false;
-            if (Exchange != setting.Exchange) return false;
             if (TurnLengthSeconds != setting.TurnLengthSeconds) return false;
             if (MaxActionsAllowed != setting.MaxActionsAllowed) return false;
             if (MaxCardsAllowed != setting.MaxCardsAllowed) return false;
-            if (ActionsInPeriodBeforeExhaustion !=  setting.ActionsInPeriodBeforeExhaustion) return false;
-            if (Description !=  setting.Description) return false;
+            if (ActionsInPeriodBeforeExhaustion != setting.ActionsInPeriodBeforeExhaustion) return false;
+            if (Description != setting.Description) return false;
             if (Id != setting.Id) return false;
+
+            //check Exchange
+            if (Exchange == null && setting.Exchange == null) { /*Do Nothing*/ }
+            else if (Exchange == null && setting.Exchange != null) { return false; }
+            else if (Exchange != null && setting.Exchange == null) { return false; }
+            else { if (!Exchange.IsEquals(setting.Exchange)) { return false; } }
+
+            //Check Personae
+            if (Personae == null && setting.Personae == null) { /*do nothing*/ }
+            else if (Personae == null && setting.Personae != null) { return false; }
+            else if (Personae != null && setting.Personae == null) { return false; }
+            else
+            {
+                foreach (Personae persona in Personae)
+                {
+                    matchFound = false;
+                    foreach (Personae persona2 in setting.Personae)
+                    {
+                        if (persona.IsEquals(persona2))
+                        {
+                            matchFound = true;
+                        };
+                    }
+                    if (matchFound == false) return false;
+                }
+            }
 
             return true;
         }
-
-        //public bool Equals(Setting setting)
-        //{
-        //    if (World != setting.World) return false;
-        //    if (OwnerName != setting.OwnerName) return false;
-        //    if (Name != setting.Name) return false;
-        //    if ()
-        //}
     }
 }

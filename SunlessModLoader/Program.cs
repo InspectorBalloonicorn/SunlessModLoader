@@ -49,6 +49,7 @@ List<Event>? addonEventList = new List<Event>();
 List<Exchange>? addonExchangeList = new List<Exchange>();
 List<Personae>? addonPersonaList = new List<Personae>();
 List<Quality>? addonQualityList = new List<Quality>();
+int conflicts = 0;
 
 foreach (var folderPath in Directory.GetFileSystemEntries(gameDirectory))
 {
@@ -79,11 +80,12 @@ foreach (var addonPath in addonDirectory)
     foreach (var folderPath in Directory.GetFileSystemEntries(addonPath))
     {
         string objectname = (folderPath.Substring(folderPath.LastIndexOf('\\')+1));
+        int conflictsPreRun = _helper.ConflictCounter;
         switch (objectname)
         {
             case ("entities"):
-            {
-                    Console.WriteLine($"Resolving entity conflicts with addon: {addonPath.Substring(addonPath.LastIndexOf("\\") + 1)}.");
+            {                    
+                    Console.WriteLine($"Resolving entity conflicts with addon: {addonPath.Substring(addonPath.LastIndexOf("\\") + 1)}.");                    
                     _helper.ReadEntities(folderPath, ref addonAreaList, ref addonEventList,
                     ref addonExchangeList, ref addonPersonaList, ref addonQualityList);                  
 
@@ -99,18 +101,46 @@ foreach (var addonPath in addonDirectory)
                     {
                         masterQualityList = _helper.CompareAndHandleQualities(addonQuality, masterQualityList);
                     }
+                    
+
+                    //Handle Personas
+                    foreach (Personae addonPersona in addonPersonaList)
+                    {
+                        masterPersonaList = _helper.CompareAndHandlePersonas(addonPersona, masterPersonaList);
+                    }
+
+                    //Handle Personas
+                    foreach (Area addonArea in addonAreaList)
+                    {
+                        masterAreaList = _helper.CompareAndHandleAreas(addonArea, masterAreaList);
+                    }
+
+                    //Handle Exchanges
+                    foreach (Exchange addonExchange in addonExchangeList)
+                    {
+                        masterExchangeList = _helper.CompareAndHandleExchanges(addonExchange, masterExchangeList);
+                    }
+
+                    conflicts = _helper.ConflictCounter - conflictsPreRun;
+                    Console.WriteLine($" Conflicts: {conflicts}\n");
                     break;
-            }
-            case ("encyclopedia"): 
+                }
+            case ("encyclopaedia"): 
             {
                     //TODO: Handle encyclopedia objects
-                    Console.WriteLine($"Resolving encyclopedia conflicts with addon: {addonPath.Substring(addonPath.LastIndexOf("\\") + 1)}.");
+
+                    conflicts = _helper.ConflictCounter - conflictsPreRun;
+                    Console.WriteLine($"Resolving encyclopaedia conflicts with addon: {addonPath.Substring(addonPath.LastIndexOf("\\") + 1)}.");
+                    Console.WriteLine($" Conflicts: {conflicts}\n");
                     break;
             }
             case ("geography"):
                 {
                     //TODO: Handle geography objects
+
+                    conflicts = _helper.ConflictCounter - conflictsPreRun;
                     Console.WriteLine($"Resolving geography conflicts with addon: {addonPath.Substring(addonPath.LastIndexOf("\\") + 1)}.");
+                    Console.WriteLine($" Conflicts: {conflicts}\n");
                     break;
                 }
             default:
@@ -120,10 +150,21 @@ foreach (var addonPath in addonDirectory)
         }
         
     }
-    // Do some work
 }
 
+////
+////
+////
+////
+////
+////
+////WRITE OUTPUT FILE
 
+
+var directoryInfo = Directory.CreateDirectory(addressBook[2]);
+
+var outputEntitiesPath = directoryInfo.FullName + "\\entities";
+_helper.WriteEntities(outputEntitiesPath, masterAreaList, masterEventList, masterExchangeList, masterPersonaList, masterQualityList);
 
 Console.WriteLine($"RUNTIME COMPLETE\n\n\nTOTAL CONFLICTS RESOLVED: {_helper.ConflictCounter}");
 Console.Beep();

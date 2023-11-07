@@ -32,15 +32,19 @@ namespace SunlessModLoader.Classes.Classes
         public bool IsEquals(ChildBranches? childBranches)
         {
             bool matchFound;
-
             if (ReferenceEquals(childBranches, null) && ReferenceEquals(this, null)) { return true; }
-            //if one is null, and the other is not, return false immediately
             if (ReferenceEquals(childBranches, null) && !ReferenceEquals(this, null)) { return false; }
             if (!ReferenceEquals(childBranches, null) && ReferenceEquals(this, null)) { return false; }
 
-
-
-            //Check each property
+            if (Name != childBranches.Name) return false;
+            if (Image != childBranches.Image) return false;
+            if (Description != childBranches.Description) return false;
+            if (ActionCost != childBranches.ActionCost) return false;
+            if (ButtonText != childBranches.ButtonText) return false;
+            if (Id != childBranches.Id) return false;
+            if (Ordering != childBranches.Ordering) return false;
+            if (RareDefaultEventChance != childBranches.RareDefaultEventChance) return false;
+            if (RareSuccessEventChance != childBranches.RareSuccessEventChance) return false;
 
             //Check Default Event
             if (DefaultEvent == null && childBranches.DefaultEvent == null) { /*Do Nothing - Move on*/ }
@@ -54,7 +58,25 @@ namespace SunlessModLoader.Classes.Classes
             else if (ParentEvent != null && childBranches.ParentEvent == null) { return false; }
             else { if (!ParentEvent.IsEquals(childBranches.ParentEvent)) { return false; } }
 
-            //For each quality required from this branch
+            //Check SuccessEvent
+            if (SuccessEvent == null && childBranches.SuccessEvent == null) { /*Do Nothing*/ }
+            else if (SuccessEvent == null && childBranches.SuccessEvent != null) { return false; }
+            else if (SuccessEvent != null && childBranches.SuccessEvent == null) { return false; }
+            else { if (!SuccessEvent.IsEquals(childBranches.SuccessEvent)) { return false; } }
+
+            //Check RareDefaultEvent
+            if (RareDefaultEvent == null && childBranches.RareDefaultEvent == null) { /*Do Nothing*/ }
+            else if (RareDefaultEvent == null && childBranches.RareDefaultEvent != null) { return false; }
+            else if (RareDefaultEvent != null && childBranches.RareDefaultEvent == null) { return false; }
+            else { if (!RareDefaultEvent.IsEquals(childBranches.RareDefaultEvent)) { return false; } }
+
+            //Check RareSuccessEvent
+            if (RareSuccessEvent == null && childBranches.RareSuccessEvent == null) { /*Do Nothing*/ }
+            else if (RareSuccessEvent == null && childBranches.RareSuccessEvent != null) { return false; }
+            else if (RareSuccessEvent != null && childBranches.RareSuccessEvent == null) { return false; }
+            else { if (!RareSuccessEvent.IsEquals(childBranches.RareSuccessEvent)) { return false; } }
+
+            //Check QualitiesRequired
             foreach (QualitiesRequired qr in QualitiesRequired)
             {
                 //check against the other list of qualities required and confirm the QualityRequired matches an id in the list.
@@ -69,38 +91,7 @@ namespace SunlessModLoader.Classes.Classes
                 }
                 if (matchFound == false) return false;
             }
-
-            if(Name != childBranches.Name) return false;
-            if(Image != childBranches.Image) return false;
-            if(Description != childBranches.Description) return false;
-            if(ActionCost != childBranches.ActionCost) return false;
-            if(ButtonText != childBranches.ButtonText) return false;
-            if(Id != childBranches.Id) return false;
-
-            //Check SuccessEvent
-            if (SuccessEvent == null && childBranches.SuccessEvent == null) { /*Do Nothing*/ }
-            else if (SuccessEvent == null && childBranches.SuccessEvent != null) { return false; }
-            else if (SuccessEvent != null && childBranches.SuccessEvent == null) { return false; }
-            else { if (!SuccessEvent.IsEquals(childBranches.SuccessEvent)) { return false; } }
-
-            if(Ordering != childBranches.Ordering) return false;
-
-            //Check RareDefaultEvent
-            if (RareDefaultEvent == null && childBranches.RareDefaultEvent == null) { /*Do Nothing*/ }
-            else if (RareDefaultEvent == null && childBranches.RareDefaultEvent != null) { return false; }
-            else if (RareDefaultEvent != null && childBranches.RareDefaultEvent == null) { return false; }
-            else { if (!RareDefaultEvent.IsEquals(childBranches.RareDefaultEvent)) { return false; } }
-
-            if (RareDefaultEventChance != childBranches.RareDefaultEventChance)
-
-            //Check RareSuccessEvent
-            if (RareSuccessEvent == null && childBranches.RareSuccessEvent == null) { /*Do Nothing*/ }
-            else if (RareSuccessEvent == null && childBranches.RareSuccessEvent != null) { return false; }
-            else if (RareSuccessEvent != null && childBranches.RareSuccessEvent == null) { return false; }
-            else { if (!RareSuccessEvent.IsEquals(childBranches.RareSuccessEvent)) { return false; } }
-
-            if (RareSuccessEventChance != childBranches.RareSuccessEventChance) return false;
-
+        
             return true;
         }
 

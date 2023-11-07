@@ -19,7 +19,7 @@ namespace SunlessModLoader.Classes.Classes
         public bool? RandomPostcard { get; set; }
         public int? MapX { get; set; }
         public int? MapY { get; set; }
-        public object? UnlocksWithQuality { get; set; }
+        public Quality? UnlocksWithQuality { get; set; }
         public bool? ShowOps { get; set; }
         public bool? PremiumSubRequired { get; set; }
         public int Id { get; set; }
@@ -39,10 +39,15 @@ namespace SunlessModLoader.Classes.Classes
             if (RandomPostcard != area.RandomPostcard) return false;
             if (MapX != area.MapX) return false;
             if (MapY != area.MapY) return false;
-            if (UnlocksWithQuality != area.UnlocksWithQuality) return false;
             if (ShowOps != area.ShowOps) return false;
             if (PremiumSubRequired != area.PremiumSubRequired) return false;
-            if (Id != area.Id) return false;            
+            if (Id != area.Id) return false;
+
+            //check UnlocksWithQuality
+            if (UnlocksWithQuality == null && area.UnlocksWithQuality == null) { /*Do Nothing*/ }
+            else if (UnlocksWithQuality == null && area.UnlocksWithQuality != null) { return false; }
+            else if (UnlocksWithQuality != null && area.UnlocksWithQuality == null) { return false; }
+            else { if (!UnlocksWithQuality.IsEquals(area.UnlocksWithQuality)) { return false; } }
 
             return true;
         }

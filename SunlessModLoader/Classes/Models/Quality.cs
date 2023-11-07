@@ -96,7 +96,7 @@ namespace SunlessModLoader.Classes.Classes
             else if (AssignToSlot != null && qual.AssignToSlot == null) { return false; }
             else { if (!AssignToSlot.IsEquals(qual.AssignToSlot)) { return false; } }
 
-            //Check Use Event
+            //Check UseEvent
             if (UseEvent == null && qual.UseEvent == null) { /*Do Nothing*/ }
             else if (UseEvent == null && qual.UseEvent != null) { return false; }
             else if (UseEvent != null && qual.UseEvent == null) { return false; }
@@ -123,7 +123,6 @@ namespace SunlessModLoader.Classes.Classes
                     if (matchFound == false) return false;
                 }
             }
-
             
             //Check Enhancements
             if (Enhancements == null && qual.Enhancements == null) { /*do nothing*/ }

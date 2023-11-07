@@ -26,6 +26,21 @@ namespace SunlessModLoader.Classes.Classes
             if (ReferenceEquals(enh, null) && !ReferenceEquals(this, null)) { return false; }
             if (!ReferenceEquals(enh, null) && ReferenceEquals(this, null)) { return false; }
 
+            if (Level != enh.Level) return false;
+            if (AssociatedQualityId != enh.AssociatedQualityId) return false;
+            if (QualityName != enh.QualityName) return false;
+            if (QualityDescription != enh.QualityDescription) return false;
+            if (QualityImage != enh.QualityImage) return false;
+            if (QualityCategory != enh.QualityCategory) return false;
+            if (QualityAllowedOn != enh.QualityAllowedOn) return false;
+            if (Id != enh.Id) return false;
+
+            //Check AssociatedQuality
+            if (AssociatedQuality == null && enh.AssociatedQuality == null) { /*Do Nothing*/ }
+            else if (AssociatedQuality == null && enh.AssociatedQuality != null) { return false; }
+            else if (AssociatedQuality != null && enh.AssociatedQuality == null) { return false; }
+            else { if (!AssociatedQuality.IsEquals(enh.AssociatedQuality)) { return false; } }
+
             return true;
         }
     }

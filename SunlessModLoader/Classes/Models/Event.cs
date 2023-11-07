@@ -51,11 +51,37 @@ namespace SunlessModLoader.Classes.Classes
             if (Autofire != @event.Autofire) { return false; }
             if (CanGoBack != @event.CanGoBack) { return false; }
             if (Category != @event.Category) { return false; }
+            if (ChallengeLevel != @event.ChallengeLevel) { return false; }
+            if (Description != @event.Description) { return false; }
+            if (Distribution != @event.Distribution) { return false; }
+            if (ExoticEffects != @event.ExoticEffects) { return false; }
+            if (Image != @event.Image) { return false; }
+            if (Name != @event.Name) { return false; }
+            if (Ordering != @event.Ordering) { return false; }
+            if (ShowAsMessage != @event.ShowAsMessage) { return false; }
+            if (Stickiness != @event.Stickiness) { return false; }
+            if (Transient != @event.Transient) { return false; }
+            if (Urgency != @event.Urgency) { return false; }
 
-            if (@event.ChallengeLevel != @event.ChallengeLevel) { return false; }
+            //check Deck
+            if (Deck == null && @event.Deck == null) { /*Do Nothing*/ }
+            else if (Deck == null && @event.Deck != null) { return false; }
+            else if (Deck != null && @event.Deck == null) { return false; }
+            else { if (!Deck.IsEquals(@event.Deck)) { return false; } }
 
-            //Check if either object is null, if they are, check if they are equal by null reference
-            //Else check both objects.
+            //check LimitedToArea
+            if (LimitedToArea == null && @event.LimitedToArea == null) { /*Do Nothing*/ }
+            else if (LimitedToArea == null && @event.LimitedToArea != null) { return false; }
+            else if (LimitedToArea != null && @event.LimitedToArea == null) { return false; }
+            else { if (!LimitedToArea.IsEquals(@event.LimitedToArea)) { return false; } }
+
+            //Check Setting
+            if (Setting == null && @event.Setting == null) { /*Do Nothing*/ }
+            else if (Setting == null && @event.Setting != null) { return false; }
+            else if (Setting != null && @event.Setting == null) { return false; }
+            else { if (!Setting.IsEquals(@event.Setting)) { return false; } }
+
+            //Check Childbranches
             if (ChildBranches == null && @event.ChildBranches == null) { /*Do nothing*/ }
             else if (ChildBranches == null && @event.ChildBranches != null) { return false; }
             else if (ChildBranches != null && @event.ChildBranches == null) { return false; }
@@ -78,27 +104,6 @@ namespace SunlessModLoader.Classes.Classes
                     if (matchFound == false) return false;
                 }
             }
-
-            //check Deck
-            if (Deck == null && @event.Deck == null) { /*Do Nothing*/ }
-            else if (Deck == null && @event.Deck != null) { return false; }
-            else if (Deck != null && @event.Deck == null) { return false; }
-            else { if (!Deck.IsEquals(@event.Deck)) { return false; } }
-
-            if (Description != @event.Description){ return false; }
-            if (Distribution != @event.Distribution){ return false; }
-            if (ExoticEffects != @event.ExoticEffects){ return false; }
-            if (Image != @event.Image) {  return false; }
-
-            //check LimitedToArea
-            if (LimitedToArea == null && @event.LimitedToArea == null) { /*Do Nothing*/ }
-            else if (LimitedToArea == null && @event.LimitedToArea != null) { return false; }
-            else if (LimitedToArea != null && @event.LimitedToArea == null) { return false; }
-            else { if (!LimitedToArea.IsEquals(@event.LimitedToArea)) { return false; } }
-
-
-            if (Name != @event.Name){ return false; }
-            if (Ordering != @event.Ordering) { return false; }
 
             //Check QualitiesAffected
             if (QualitiesAffected == null && @event.QualitiesAffected == null) { /*do nothing*/ }
@@ -144,22 +149,7 @@ namespace SunlessModLoader.Classes.Classes
                     }
                     if (matchFound == false) return false;
                 }
-            }
-
-            //Check Setting
-            if (Setting == null && @event.Setting == null) { /*Do Nothing*/ }
-            else if (Setting == null && @event.Setting != null) { return false; }
-            else if (Setting != null && @event.Setting == null) { return false; }
-            else { if (!Setting.IsEquals(@event.Setting)) { return false; } }
-
-            if (ShowAsMessage != @event.ShowAsMessage) { return false; }
-
-            if (Stickiness != @event.Stickiness) { return false; }
-
-            if (Transient != @event.Transient) { return false; }
-
-            if (Urgency != @event.Urgency) { return false; }
-
+            }         
             return true;
         }
     }
