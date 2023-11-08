@@ -31,6 +31,20 @@ namespace SunlessModLoader.Classes.Classes
         public bool? Transient { get; set; }
         public LimitedToArea? LimitedToArea { get; set; }
         public bool? ShowAsMessage { get; set; }
+        public string? UnclearedEditAt { get; set; }
+        public string? LastEditBy { get; set; }
+        public string? LivingStory { get; set; }
+        public string? World { get; set; }
+        public string? MoveToAreaId { get; set; }
+        public MoveToArea? MoveToArea { get; set; }
+        public string? MoveToDomicile { get; set; }
+        public SwitchToSetting? SwitchToSetting { get; set; }
+        public int? FatePointsChange { get; set; }
+        public int? BootyValue { get; set; }
+        public string? LogInJournalAgainstQuality {get; set;}
+        public string? OwnerName { get; set; }
+        public DateTime? DateTimeCreated { get; set; }
+        public bool AutoFire { get; set; }
 
         public Event()
         {
@@ -63,6 +77,19 @@ namespace SunlessModLoader.Classes.Classes
             if (Transient != @event.Transient) { return false; }
             if (Urgency != @event.Urgency) { return false; }
 
+            if (UnclearedEditAt != @event.UnclearedEditAt) { return false; }
+            if (LastEditBy != @event.LastEditBy) { return false; }
+            if (LivingStory != @event.LivingStory) { return false; }
+            if (World != @event.World) { return false; }
+            if (MoveToAreaId != @event.MoveToAreaId) { return false; }
+            if (MoveToDomicile != @event.MoveToDomicile) { return false; }
+            if (FatePointsChange != @event.FatePointsChange) { return false; }
+            if (BootyValue != @event.BootyValue) { return false; }
+            if (LogInJournalAgainstQuality != @event.LogInJournalAgainstQuality) { return false; }
+            if (OwnerName != @event.OwnerName) { return false; }
+            if (AutoFire != @event.AutoFire) { return false; }
+
+
             //check Deck
             if (Deck == null && @event.Deck == null) { /*Do Nothing*/ }
             else if (Deck == null && @event.Deck != null) { return false; }
@@ -80,6 +107,24 @@ namespace SunlessModLoader.Classes.Classes
             else if (Setting == null && @event.Setting != null) { return false; }
             else if (Setting != null && @event.Setting == null) { return false; }
             else { if (!Setting.IsEquals(@event.Setting)) { return false; } }
+
+            //check MoveToArea
+            if (MoveToArea == null && @event.MoveToArea == null) { /*Do Nothing*/ }
+            else if (MoveToArea == null && @event.MoveToArea != null) { return false; }
+            else if (MoveToArea != null && @event.MoveToArea == null) { return false; }
+            else { if (!MoveToArea.IsEquals(@event.MoveToArea)) { return false; } }
+
+            //check SwitchToSetting
+            if (SwitchToSetting == null && @event.SwitchToSetting == null) { /*Do Nothing*/ }
+            else if (SwitchToSetting == null && @event.SwitchToSetting != null) { return false; }
+            else if (SwitchToSetting != null && @event.SwitchToSetting == null) { return false; }
+            else { if (!SwitchToSetting.IsEquals(@event.SwitchToSetting)) { return false; } }
+
+            //check DateTimeCreated
+            if (DateTimeCreated == null && @event.DateTimeCreated == null) { /*Do Nothing*/ }
+            else if (DateTimeCreated == null && @event.DateTimeCreated != null) { return false; }
+            else if (DateTimeCreated != null && @event.DateTimeCreated == null) { return false; }
+            else { if (!DateTimeCreated.Equals(@event.DateTimeCreated)) { return false; } }
 
             //Check Childbranches
             if (ChildBranches == null && @event.ChildBranches == null) { /*Do nothing*/ }

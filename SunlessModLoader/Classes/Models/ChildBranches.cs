@@ -23,6 +23,9 @@ namespace SunlessModLoader.Classes.Classes
         public int? RareDefaultEventChance { get; set; }
         public RareSuccessEvent? RareSuccessEvent { get; set; }
         public int? RareSuccessEventChance { get; set; }
+        public string Act { get; set; }
+        public bool Archived { get; set; }
+        public string RenameQualityCategory { get; set; }
 
 
         public ChildBranches()
@@ -45,6 +48,10 @@ namespace SunlessModLoader.Classes.Classes
             if (Ordering != childBranches.Ordering) return false;
             if (RareDefaultEventChance != childBranches.RareDefaultEventChance) return false;
             if (RareSuccessEventChance != childBranches.RareSuccessEventChance) return false;
+
+            if (Act != childBranches.Act) return false;
+            if (Archived != childBranches.Archived) return false;
+            if (RenameQualityCategory != childBranches.RenameQualityCategory) return false;
 
             //Check Default Event
             if (DefaultEvent == null && childBranches.DefaultEvent == null) { /*Do Nothing - Move on*/ }

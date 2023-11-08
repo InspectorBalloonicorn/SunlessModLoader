@@ -591,6 +591,17 @@ namespace SunlessModLoader.Classes.Helpers
             if (addonEvent.Stickiness != masterEvent.Stickiness){masterEvent.Stickiness = addonEvent.Stickiness;}
             if (addonEvent.Transient != masterEvent.Transient){masterEvent.Transient = addonEvent.Transient;}
             if (addonEvent.Urgency != masterEvent.Urgency){masterEvent.Urgency = addonEvent.Urgency;}
+            if (addonEvent.UnclearedEditAt != masterEvent.UnclearedEditAt) { masterEvent.UnclearedEditAt = addonEvent.UnclearedEditAt; }
+            if (addonEvent.LastEditBy != masterEvent.LastEditBy) { masterEvent.LastEditBy = addonEvent.LastEditBy; }
+            if (addonEvent.LivingStory != masterEvent.LivingStory) { masterEvent.LivingStory = addonEvent.LivingStory; }
+            if (addonEvent.World != masterEvent.World) { masterEvent.World = addonEvent.World; }
+            if (addonEvent.MoveToAreaId != masterEvent.MoveToAreaId) { masterEvent.MoveToAreaId = addonEvent.MoveToAreaId; }
+            if (addonEvent.MoveToDomicile != masterEvent.MoveToDomicile) { masterEvent.MoveToDomicile = addonEvent.MoveToDomicile; }
+            if (addonEvent.FatePointsChange != masterEvent.FatePointsChange) { masterEvent.FatePointsChange = addonEvent.FatePointsChange; }
+            if (addonEvent.BootyValue != masterEvent.BootyValue) { masterEvent.BootyValue = addonEvent.BootyValue; }
+            if (addonEvent.LogInJournalAgainstQuality != masterEvent.LogInJournalAgainstQuality) { masterEvent.LogInJournalAgainstQuality = addonEvent.LogInJournalAgainstQuality; }
+            if (addonEvent.OwnerName != masterEvent.OwnerName) { masterEvent.OwnerName = addonEvent.OwnerName; }
+            if (addonEvent.AutoFire != masterEvent.AutoFire) { masterEvent.AutoFire = addonEvent.AutoFire; }
 
             //check LimitedToArea
             if (addonEvent.LimitedToArea == null && masterEvent.LimitedToArea == null) { /*Do Nothing*/ }
@@ -609,6 +620,24 @@ namespace SunlessModLoader.Classes.Helpers
             else if (addonEvent.Deck == null && masterEvent.Deck != null) { masterEvent.Deck = addonEvent.Deck; }
             else if (addonEvent.Deck != null && masterEvent.Deck == null) { masterEvent.Deck = addonEvent.Deck; }
             else { if (!addonEvent.Deck.IsEquals(masterEvent.Deck)) { masterEvent.Deck = addonEvent.Deck; } }
+
+            //check MoveToArea
+            if (addonEvent.MoveToArea == null && masterEvent.MoveToArea == null) { /*Do Nothing*/ }
+            else if (addonEvent.MoveToArea == null && masterEvent.MoveToArea != null) { masterEvent.MoveToArea = addonEvent.MoveToArea; }
+            else if (addonEvent.MoveToArea != null && masterEvent.MoveToArea == null) { masterEvent.MoveToArea = addonEvent.MoveToArea; }
+            else { if (!addonEvent.MoveToArea.IsEquals(masterEvent.MoveToArea)) { masterEvent.MoveToArea = addonEvent.MoveToArea; } }
+
+            //check SwitchToSetting
+            if (addonEvent.SwitchToSetting == null && masterEvent.SwitchToSetting == null) { /*Do Nothing*/ }
+            else if (addonEvent.SwitchToSetting == null && masterEvent.SwitchToSetting != null) { masterEvent.SwitchToSetting = addonEvent.SwitchToSetting; }
+            else if (addonEvent.SwitchToSetting != null && masterEvent.SwitchToSetting == null) { masterEvent.SwitchToSetting = addonEvent.SwitchToSetting; }
+            else { if (!addonEvent.SwitchToSetting.IsEquals(masterEvent.SwitchToSetting)) { masterEvent.SwitchToSetting = addonEvent.SwitchToSetting; } }
+
+            //check DateTimeCreated
+            if (addonEvent.DateTimeCreated == null && masterEvent.DateTimeCreated == null) { /*Do Nothing*/ }
+            else if (addonEvent.DateTimeCreated == null && masterEvent.DateTimeCreated != null) { masterEvent.DateTimeCreated = addonEvent.DateTimeCreated; }
+            else if (addonEvent.DateTimeCreated != null && masterEvent.DateTimeCreated == null) { masterEvent.DateTimeCreated = addonEvent.DateTimeCreated; }
+            else { if (!addonEvent.DateTimeCreated.Equals(masterEvent.DateTimeCreated)) { masterEvent.DateTimeCreated = addonEvent.DateTimeCreated; } }
 
             //Check Child Branches
             if (addonEvent.ChildBranches == null && masterEvent.ChildBranches == null) { /*Do Nothing*/ }
@@ -850,6 +879,21 @@ namespace SunlessModLoader.Classes.Helpers
             if(addonChildBranch.Ordering != masterChildBranch.Ordering)
             {
                 masterChildBranch.Ordering = addonChildBranch.Ordering;
+            }
+
+            if (addonChildBranch.Act != masterChildBranch.Act)
+            {
+                masterChildBranch.Act = addonChildBranch.Act;
+            }
+
+            if (addonChildBranch.Archived != masterChildBranch.Archived)
+            {
+                masterChildBranch.Archived = addonChildBranch.Archived;
+            }
+
+            if (addonChildBranch.RenameQualityCategory != masterChildBranch.RenameQualityCategory)
+            {
+                masterChildBranch.RenameQualityCategory = addonChildBranch.RenameQualityCategory;
             }
 
             //Check ParentEvent
@@ -1153,6 +1197,8 @@ namespace SunlessModLoader.Classes.Helpers
         public void WriteEntities(string entitiesOutputPath, List<Area> areaList, List<Event> eventList,
            List<Exchange> exchangeList, List<Personae> personaList, List<Quality> qualityList)
         {
+            Directory.CreateDirectory(entitiesOutputPath);
+
             var areaOutputFilePath = entitiesOutputPath + "\\areas.json";
             var eventOutputFilePath = entitiesOutputPath + "\\events.json";
             var exchangeOutputFilePath = entitiesOutputPath + "\\exchanges.json";
@@ -1161,28 +1207,70 @@ namespace SunlessModLoader.Classes.Helpers
 
             //Write Areas
             string areaOutput = JsonConvert.SerializeObject(areaList, Formatting.Indented);
-            File.Create(areaOutputFilePath).Close();
-            File.WriteAllText(areaOutputFilePath, areaOutput);
+
+            try
+            {
+                File.Create(areaOutputFilePath).Close();
+                File.WriteAllText(areaOutputFilePath, areaOutput);
+            }
+            catch
+            {
+                File.Create(areaOutputFilePath);
+                File.WriteAllText(areaOutputFilePath, areaOutput);
+            }
+            
 
             //Write Events
             string eventOutput = JsonConvert.SerializeObject(eventList, Formatting.Indented);
-            File.Create(eventOutputFilePath).Close();
-            File.WriteAllText(eventOutputFilePath, eventOutput);
+            try
+            {
+                File.Create(eventOutputFilePath).Close();
+                File.WriteAllText(eventOutputFilePath, eventOutput);
+            }
+            catch
+            {
+                File.Create(eventOutputFilePath);
+                File.WriteAllText(eventOutputFilePath, eventOutput);
+            }
 
             //Write Exchanges
             string exchangeOutput = JsonConvert.SerializeObject(exchangeList, Formatting.Indented);
-            File.Create(exchangeOutputFilePath).Close();
-            File.WriteAllText(exchangeOutputFilePath, exchangeOutput);
+            try
+            {
+                File.Create(exchangeOutputFilePath).Close();
+                File.WriteAllText(exchangeOutputFilePath, exchangeOutput);
+            }
+            catch
+            {
+                File.Create(exchangeOutputFilePath);
+                File.WriteAllText(exchangeOutputFilePath, exchangeOutput);
+            }
 
             //Write Personae
             string personaeOutput = JsonConvert.SerializeObject(personaList, Formatting.Indented);
-            File.Create(personaOutputFilePath).Close();
-            File.WriteAllText(personaOutputFilePath, personaeOutput);
+            try
+            {
+                File.Create(personaOutputFilePath).Close();
+                File.WriteAllText(personaOutputFilePath, personaeOutput);
+            }
+            catch
+            {
+                File.Create(personaOutputFilePath);
+                File.WriteAllText(personaOutputFilePath, personaeOutput);
+            }
 
             //Write Quality
             string qualityOutput = JsonConvert.SerializeObject(qualityList, Formatting.Indented);
-            File.Create(qualityOutputFilePath).Close();
-            File.WriteAllText(qualityOutputFilePath, qualityOutput);
+            try
+            {
+                File.Create(qualityOutputFilePath).Close();
+                File.WriteAllText(qualityOutputFilePath, qualityOutput);
+            }
+            catch
+            {
+                File.Create(qualityOutputFilePath);
+                File.WriteAllText(qualityOutputFilePath, qualityOutput);
+            }
         }
 
 
